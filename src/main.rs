@@ -1,10 +1,13 @@
 use std::io::Read;
 use std::io::Write;
 use std::str;
+use std::net::Shutdown;
+use std::net::TcpStream;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener};
 use std::process::Command;
 use std::process::Output;
 use std::error::Error;
+use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
@@ -41,7 +44,23 @@ fn shutdown() -> std::io::Result<Output> {
 
 #[tokio::main]
 async fn main() -> Result<(),Box<dyn Error>> {
-    let listening_address = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 2137);
+    
+    // Notify the discord bot that the server has been turned on
+    let server_ip = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(192,168,1,201)), 2139);
+    let mut stream = TcpStream::connect(server_ip)?;
+
+    stream
+        .set_write_timeout(Some(Duration::new(10, 0)))
+        .expect("set_write_timeout call failed");
+    stream
+        .set_read_timeout(Some(Duration::new(10, 0)))
+        .expect("set_read_timeout call failed");
+
+    stream.write_all(b"{\"type_of_event\": \"turn_on\", \"player\": \"Server\", \"content\": \"\"}")?;
+    stream.shutdown(Shutdown::Both)?;
+    drop(stream);
+
+    let listening_address = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 2137);
     let listener = TcpListener::bind(listening_address).expect("Failed to create TcpListener");
 
         for stream in listener.incoming() {
