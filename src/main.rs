@@ -40,7 +40,7 @@ fn shutdown() -> std::io::Result<Output> {
 }
 
 fn main() -> Result<(),Box<dyn Error>> {
-    let listening_address = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 2137);
+    let listening_address = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0,0)), 2137);
     let listener = TcpListener::bind(listening_address).expect("Failed to create TcpListener");
 
         for stream in listener.incoming() {
