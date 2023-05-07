@@ -39,8 +39,7 @@ fn shutdown() -> std::io::Result<Output> {
     Command::new("shutdown").output()
 }
 
-#[tokio::main]
-async fn main() -> Result<(),Box<dyn Error>> {
+fn main() -> Result<(),Box<dyn Error>> {
     let listening_address = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 2137);
     let listener = TcpListener::bind(listening_address).expect("Failed to create TcpListener");
 
